@@ -383,7 +383,18 @@ class qtype_oumatrix_single_renderer extends qtype_oumatrix_renderer_base {
         $question = $qa->get_question();
         $right = [];
         foreach ($question->rows as $row) {
-            $right[] = $row->name . ' → ' . $question->columns[array_key_first($row->correctanswers)]->name;
+            $columnname = null;
+            if (!empty($row->correctanswers) && is_array($row->correctanswers)) {
+                $key = array_key_first($row->correctanswers);
+                if (
+                    $key !== null &&
+                    isset($question->columns[$key]) &&
+                    !empty($question->columns[$key]->name)
+                ) {
+                    $columnname = $question->columns[$key]->name;
+                }
+            }
+            $right[] = $row->name . ' → ' . ($columnname ?? get_string('none', 'qtype_oumatrix'));
         }
         return $this->correct_choices($right);
     }
